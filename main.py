@@ -128,13 +128,13 @@ if app.config['SQLALCHEMY_DATABASE_URI'] != SQLITEDB:
     print(inspector.get_schema_names())
     print(inspector.default_schema_name)
     print(inspector.get_table_names())
-    if not inspector.has_table(table_name="user", schema="main"):
-        print(inspector.has_table(table_name="user", schema="main"))
+    if not inspector.has_table(table_name="user"):
+        print(inspector.has_table(table_name="user"))
         print("DB Init")
-        # with app.app_context():
-        #     db.drop_all()
-        #     db.create_all()
-        #     app.logger.info('Initialized the database!')
+        with app.app_context():
+            db.drop_all()
+            db.create_all()
+            app.logger.info('Initialized the database!')
     else:
         print("DB exist")
         app.logger.info('Database already contains the needed tables.')
