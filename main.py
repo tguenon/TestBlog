@@ -1,5 +1,4 @@
 from flask import Flask, render_template, redirect, url_for, flash, request, abort
-import werkzeug
 from flask_bootstrap import Bootstrap5
 from flask_ckeditor import CKEditor
 from datetime import date
@@ -11,7 +10,11 @@ from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm
 from flask_gravatar import Gravatar
 from functools import wraps
 from dotenv import dotenv_values
+import os
+import psycopg2
+import sqlalchemy as sa
 
+SQLITEDB = "sqlite:///blog.db"
 config = dotenv_values(".env")
 
 
@@ -21,7 +24,14 @@ ckeditor = CKEditor(app)
 Bootstrap5(app)
 
 # CONNECT TO DB
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
+if os.getenv('DATABASE_URL'):
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL').replace("postgres://", "postgresql://", 1)
+else:
+    SQLALCHEMY_DATABASE_URI = SQLITEDB
+
+# print(SQLALCHEMY_DATABASE_URI)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy()
 db.init_app(app)
@@ -105,8 +115,31 @@ def is_admin():
     return admin_user
 
 
+# Check if the database needs to be initialized
+
+if app.config['SQLALCHEMY_DATABASE_URI'] != SQLITEDB:
+    print(app.config['SQLALCHEMY_DATABASE_URI'])
+    engine = sa.create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
+    print(engine)
+    inspector = sa.inspect(engine)
+    print(inspector)
+    print(type(inspector))
+    print(inspector.info_cache)
+    print(inspector.get_schema_names())
+    print(inspector.default_schema_name)
+    print(inspector.get_table_names())
+    if not inspector.has_table(table_name="user", schema="main"):
+        print(inspector.has_table(table_name="user", schema="main"))
+        print("DB Init")
+        # with app.app_context():
+        #     db.drop_all()
+        #     db.create_all()
+        #     app.logger.info('Initialized the database!')
+    else:
+        print("DB exist")
+        app.logger.info('Database already contains the needed tables.')
+
 with app.app_context():
-    db.create_all()
     posts = db.session.execute(db.select(BlogPost)).scalars().all()
 
 
