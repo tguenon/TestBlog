@@ -142,6 +142,7 @@ if app.config['SQLALCHEMY_DATABASE_URI'] != SQLITEDB:
             # admin_user.password = generate_password_hash(config['ADMIN_PWD'], method='pbkdf2:sha256', salt_length=8)
             admin_user.password = config['ADMIN_HASH_PWD']
             admin_user.name = config['ADMIN_NAME']
+            admin_user.admin = True
             with app.app_context():
                 db.session.add(admin_user)
                 db.session.commit()
