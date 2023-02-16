@@ -1,17 +1,17 @@
+{% extends 'base.html' %}
 {% from 'bootstrap5/form.html' import render_form %}
 
 {% block content %}
 {% include "header.html" %}
-
   <!-- Page Header -->
-  <header class="masthead" style="background-image: url({{ url_for('static', filename='img/no-entry.jpg')}})">
+  <header class="masthead" style="background-image: url('{{ url_for('static', filename='img/user-edit.jpg')}}')">
     <div class="overlay"></div>
     <div class="container">
       <div class="row">
         <div class="col-lg-8 col-md-10 mx-auto">
           <div class="page-heading">
-            <h1>Not Authorized</h1>
-            <span class="subheading">This page is for admin only</span>
+            <h1>Edit User</h1>
+            <span class="subheading">Update user's attributes</span>
           </div>
         </div>
       </div>
@@ -19,9 +19,11 @@
   </header>
 
   <div class="container">
-        <div class="col-lg-8 col-md-10 mx-auto content">
-        <p>Please Log In or Register as Admin</p>
+    <div class="row">
+      <div class="col-lg-8 col-md-10 mx-auto">
+        {{ render_form(form, novalidate=True, button_map={"submit": "primary"}) }}
       </div>
+    </div>
   </div>
 
 {% include "footer.html" %}

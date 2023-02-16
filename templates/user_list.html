@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% from 'bootstrap5/utils.html' import render_icon %}
+
+{% block content %}
+{% include "header.html" %}
+
+  <!-- Page Header -->
+  <header class="masthead" style="background-image: url('{{ url_for('static', filename='img/people.jpg')}}')">
+    <div class="overlay"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+          <div class="page-heading">
+            <h1>User List</h1>
+            <span class="subheading">Select the user to update</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+
+ <!-- Main Content -->
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-md-10 mx-auto">
+
+    	  <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Email</th>
+<!--              <th scope="col">Password</th>-->
+              <th scope="col">Name</th>
+              <th scope="col">Admin</th>
+                <th scope="col"> </th>
+
+            </tr>
+          </thead>
+          <tbody>
+          {% for user in user_list: %}
+          <tbody>
+            <tr>
+              <th class="align-middle" scope="row">{{user.email}}</th>
+
+<!--              <td>{{user.password}}</td>-->
+              <td class="align-middle">{{user.name}}</td>
+<!--              <td>{{user.admin}}</td>-->
+                <td class="align-middle">
+                {% if not user.admin: %}
+                    <div class="text-center">
+                    {{ render_icon('square') }}
+<!--                <div class="form-check form-switch">-->
+<!--                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">-->
+<!--  <label class="form-check-label" for="flexSwitchCheckDefault">Default switch checkbox input</label>-->
+                 {%else: %}
+                </div>
+                    <div class="text-center">
+                     {{ render_icon('check-square-fill') }}
+<!--                <div class="form-check form-switch">-->
+<!--                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked>-->
+<!--                    <label class="form-check-label" for="flexSwitchCheckChecked">Checked switch checkbox input</label>-->
+                </div>
+                {% endif %}
+                </td>
+
+                <td><a class="btn btn-primary" href="{{ url_for('update_user', user_id=user.id ) }}" role="button">Edit User</a></td>
+
+            </tr>
+          </tbody>
+          {% endfor %}
+          </table>
+      </div>
+    </div>
+  </div>
+
+
+{% include "footer.html" %}
+
+{% endblock %}

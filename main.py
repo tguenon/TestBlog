@@ -6,7 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
-from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm
+from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm, AdminUserForm
 from flask_gravatar import Gravatar
 from functools import wraps
 from dotenv import dotenv_values
@@ -22,6 +22,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = config['SECRET_KEY']
 ckeditor = CKEditor(app)
 Bootstrap5(app)
+app.config['BOOTSTRAP_ICON_COLOR'] = config['ICON_BASE_COLOR']
 
 # CONNECT TO DB
 if os.getenv('DATABASE_URL'):
@@ -116,24 +117,34 @@ def is_admin():
 
 
 # Check if the database needs to be initialized
+# not for SQLite at it seems that inspector.has_table() fails to return a valid status
 
 if app.config['SQLALCHEMY_DATABASE_URI'] != SQLITEDB:
-    print(app.config['SQLALCHEMY_DATABASE_URI'])
+    # print(app.config['SQLALCHEMY_DATABASE_URI'])
     engine = sa.create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
-    print(engine)
+    # print(engine)
     inspector = sa.inspect(engine)
-    print(inspector)
-    print(type(inspector))
-    print(inspector.info_cache)
-    print(inspector.get_schema_names())
-    print(inspector.default_schema_name)
-    print(inspector.get_table_names())
+    # print(inspector)
+    # print(type(inspector))
+    # print(inspector.info_cache)
+    # print(inspector.get_schema_names())
+    # print(inspector.default_schema_name)
+    # print(inspector.get_table_names())
     if not inspector.has_table(table_name="user"):
-        print(inspector.has_table(table_name="user"))
-        print("DB Init")
+        # print(inspector.has_table(table_name="user"))
+        # print("DB Init")
         with app.app_context():
             db.drop_all()
             db.create_all()
+            # adding one admin user so that we're not stuck
+            admin_user = User()
+            admin_user.email = config['ADMIN_USER']
+            # admin_user.password = generate_password_hash(config['ADMIN_PWD'], method='pbkdf2:sha256', salt_length=8)
+            admin_user.password = config['ADMIN_HASH_PWD']
+            admin_user.name = config['ADMIN_NAME']
+            with app.app_context():
+                db.session.add(admin_user)
+                db.session.commit()
             app.logger.info('Initialized the database!')
     else:
         print("DB exist")
@@ -149,6 +160,40 @@ def get_all_posts():
     with app.app_context():
         posts = db.session.execute(db.select(BlogPost)).scalars().all()
         return render_template("index.html", all_posts=posts, logged_in=current_user.is_authenticated, admin_user=is_admin())
+
+
+@app.route('/user_list', methods=["GET", "POST"])
+@admin_only
+def list_users():
+    users = db.session.execute(db.select(User).order_by(User.name)).scalars().all()
+    #
+    # def sort_on_name(e):
+    #     return e['name']
+    return render_template("user_list.html", user_list=users, logged_in=current_user.is_authenticated, admin_user=is_admin())
+
+
+@app.route('/update_user/<int:user_id>', methods=["GET", "POST"])
+@admin_only
+def update_user(user_id):
+    user_to_update = db.session.get(User, user_id)
+    user_form = AdminUserForm(
+        email=user_to_update.email,
+        password=user_to_update.password,
+        name=user_to_update.name,
+        admin_toggle=user_to_update.admin,
+    )
+    if user_form.validate_on_submit():
+        user_to_update.email = user_form.email.data
+        # print(user_form.password.data)
+        # print(user_to_update.password)
+        if user_form.password.data != user_to_update.password:
+            user_to_update.password = generate_password_hash(user_form.password.data, method='pbkdf2:sha256', salt_length=8)
+        user_to_update.name = user_form.name.data
+        user_to_update.admin = user_form.admin_toggle.data
+        db.session.commit()
+        # print("User update done")
+        return redirect(url_for('get_all_posts'))
+    return render_template("edit-user.html", form=user_form, logged_in=current_user.is_authenticated, admin_user=is_admin())
 
 
 @app.route('/register', methods=["GET", "POST"])
@@ -247,7 +292,7 @@ def add_new_post():
         db.session.add(new_post)
         db.session.commit()
         return redirect(url_for("get_all_posts"))
-    return render_template("make-post.html", form=form, logged_in=current_user.is_authenticated)
+    return render_template("make-post.html", form=form, logged_in=current_user.is_authenticated, is_edit=False)
 
 
 @app.route("/edit-post/<int:post_id>", methods=["GET", "POST"])
@@ -269,7 +314,7 @@ def edit_post(post_id):
         db.session.commit()
         return redirect(url_for("show_post", post_id=post.id))
 
-    return render_template("make-post.html", form=edit_form, logged_in=current_user.is_authenticated)
+    return render_template("make-post.html", form=edit_form, logged_in=current_user.is_authenticated, is_edit=True)
 
 
 @app.route("/delete/<int:post_id>")

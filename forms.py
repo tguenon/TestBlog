@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, PasswordField
+from wtforms import StringField, SubmitField, PasswordField, BooleanField
+from wtforms.widgets import PasswordInput
 from wtforms.validators import DataRequired, InputRequired, URL, Email
 from flask_ckeditor import CKEditorField
 
@@ -20,6 +21,14 @@ class RegisterForm(FlaskForm):
     password = PasswordField("Password", validators=[InputRequired()])
     name = StringField("Name", validators=[InputRequired()])
     submit = SubmitField("Sign me up!")
+
+
+class AdminUserForm(FlaskForm):
+    email = StringField("Email", validators=[InputRequired(), Email()])
+    password = StringField("Password", widget=PasswordInput(hide_value=False))
+    name = StringField("Name", validators=[InputRequired()])
+    admin_toggle = BooleanField("Administrator", false_values=(False,"false"))
+    submit = SubmitField("Update")
 
 
 class LoginForm(FlaskForm):
