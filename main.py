@@ -25,6 +25,8 @@ Bootstrap5(app)
 app.config['BOOTSTRAP_ICON_COLOR'] = config['ICON_BASE_COLOR']
 app.config['BOOTSTRAP_BOOTSWATCH_THEME'] = 'Yeti'
 
+
+
 # CONNECT TO DB
 if os.getenv('DATABASE_URL'):
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL').replace("postgres://", "postgresql://", 1)
