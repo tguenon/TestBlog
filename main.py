@@ -23,6 +23,7 @@ app.config['SECRET_KEY'] = config['SECRET_KEY']
 ckeditor = CKEditor(app)
 Bootstrap5(app)
 app.config['BOOTSTRAP_ICON_COLOR'] = config['ICON_BASE_COLOR']
+app.config['BOOTSTRAP_BOOTSWATCH_THEME'] = 'Yeti'
 
 # CONNECT TO DB
 if os.getenv('DATABASE_URL'):
