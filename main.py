@@ -180,6 +180,7 @@ def list_users():
 @admin_only
 def update_user(user_id):
     user_to_update = db.session.get(User, user_id)
+    user_to_update = db.session.execute(db.select(User).filter_by(id=user_id)).scalar_one()
     user_form = AdminUserForm(
         email=user_to_update.email,
         password=user_to_update.password,
