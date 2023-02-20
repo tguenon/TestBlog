@@ -12,7 +12,7 @@
             <div class="col-lg-8 col-md-10 mx-auto">
                 <div class="page-heading">
                     <h1>User List</h1>
-                    <span class="subheading">Select the user to update - Admin have black cards</span>
+                    <span class="subheading">Select the user to update</span>
                 </div>
             </div>
         </div>
@@ -30,62 +30,64 @@
             {% for user in user_list: %}
 
             <div class="col-lg-3 col-md-4">
-                {% if user.admin: %}
-                <div class="card text-bg-dark h-100 text-center">
+                <div class="card h-100 text-center">
+                    <!--                        <img src="{{ user.email | gravatar }}" class="card-img-top" >-->
+                    {% if user.admin: %}
+                    <div class="card-header text-danger fw-bold">ADMIN</div>
                     {% else:%}
-                    <div class="card h-100 text-center">
+                    <div class="card-header">Regular User</div>
+                    {% endif%}
+                    <div class="card-body">
+                        <h5 class="card-title">{{user.name}}</h5>
+                        <p class="card-text">{{user.email}}</p>
+                        <a class="stretched-link" href="{{ url_for('update_user', user_id=user.id ) }}"</a>
 
-                        {% endif %}
-                        <div class="card-body">
-                            <h5 class="card-title">{{user.name}}</h5>
-                            <p class="card-text">{{user.email}}</p>
-
-                        </div>
-                        <div class="card-footer text-muted">
-                            <a class="btn btn-primary" href="{{ url_for('update_user', user_id=user.id ) }}"
-                               role="button">Edit User</a>
-                        </div>
                     </div>
+                    <!--                        <div class="card-footer text-muted">-->
+                    <!--                            <a class="btn btn-primary stretched-link" href="{{ url_for('update_user', user_id=user.id ) }}"-->
+                    <!--                               role="button">Edit User</a>-->
+                    <!--                        </div>-->
                 </div>
-                <p></p>
-                {% endfor %}
             </div>
-
+            <p></p>
+            {% endfor %}
         </div>
 
     </div>
-    <!--      </div>-->
 
-    <!--          {% for user in user_list: %}-->
-    <!--            <div class="container text-start">-->
-    <!--        <div class="row align-items-start" style="font-size: 1.5vw;">-->
-    <!--            <div class="col text-break">-->
-    <!--                {{user.email}}-->
-    <!--            </div>-->
-    <!--            <div class="col">-->
-    <!--               {{user.name}}-->
-    <!--            </div>-->
-    <!--            <div class="col">-->
-    <!--                <div class="container text-center">-->
-    <!--                {% if not user.admin: %}-->
-    <!--                    {{ render_icon('square') }}-->
-    <!--                {%else: %}-->
-    <!--                    {{ render_icon('check-square-fill') }}-->
-    <!--                {% endif %}-->
-    <!--                </div>-->
-    <!--            </div>-->
-    <!--            <div class="col">-->
-    <!--                <div class="row align-items-start">-->
-    <!--                    <a href="{{ url_for('update_user', user_id=user.id ) }}">{{ render_icon('pencil-fill') }}</a>-->
-    <!--                </div>-->
-    <!--            </div>-->
-    <!--        </div>-->
-    <!--      </div>-->
-    <!--      {% endfor %}-->
+</div>
+<!--      </div>-->
 
-    <!--  </div>-->
+<!--          {% for user in user_list: %}-->
+<!--            <div class="container text-start">-->
+<!--        <div class="row align-items-start" style="font-size: 1.5vw;">-->
+<!--            <div class="col text-break">-->
+<!--                {{user.email}}-->
+<!--            </div>-->
+<!--            <div class="col">-->
+<!--               {{user.name}}-->
+<!--            </div>-->
+<!--            <div class="col">-->
+<!--                <div class="container text-center">-->
+<!--                {% if not user.admin: %}-->
+<!--                    {{ render_icon('square') }}-->
+<!--                {%else: %}-->
+<!--                    {{ render_icon('check-square-fill') }}-->
+<!--                {% endif %}-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="col">-->
+<!--                <div class="row align-items-start">-->
+<!--                    <a href="{{ url_for('update_user', user_id=user.id ) }}">{{ render_icon('pencil-fill') }}</a>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--      {% endfor %}-->
+
+<!--  </div>-->
 
 
-    {% include "footer.html" %}
+{% include "footer.html" %}
 
-    {% endblock %}
+{% endblock %}
