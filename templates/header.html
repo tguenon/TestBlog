@@ -29,12 +29,14 @@
 <body>
 
 <!-- Navigation -->
+{% from 'bootstrap5/utils.html' import render_icon %}
 <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
     <div class="container">
         {% if not logged_in: %}
         <a class="navbar-brand" href="{{url_for('get_all_posts')}}">Test Blog</a>
         {% else: %}
-        <a class="navbar-brand" href="{{url_for('get_all_posts')}}">Welcome {{current_user.name}}</a>
+        <a class="navbar-brand" href="{{url_for('get_all_posts')}}">{{ render_icon('person') }} {{current_user.name}}</a>
+<!--        <i class="bi bi-person"></i><a class="navbar-brand" href="{{url_for('get_all_posts')}}"> {{current_user.name}}</a>-->
         {% endif %}
         <button aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"
                 class="navbar-toggler navbar-toggler-right" data-target="#navbarResponsive" data-toggle="collapse"
